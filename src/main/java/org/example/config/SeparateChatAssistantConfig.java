@@ -1,0 +1,26 @@
+package org.example.config;
+
+import dev.langchain4j.memory.chat.ChatMemoryProvider;
+import dev.langchain4j.memory.chat.MessageWindowChatMemory;
+import dev.langchain4j.store.memory.chat.InMemoryChatMemoryStore;
+import org.example.sotre.MongoChatMemoryStore;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+public class SeparateChatAssistantConfig {
+    @Autowired
+    private MongoChatMemoryStore mongoChatMemoryStore;
+
+    @Bean
+    public ChatMemoryProvider chatMemoryProvider() {
+        return memoryId ->
+                MessageWindowChatMemory.builder()
+                .id(memoryId)
+                .maxMessages(10)
+                //.chatMemoryStore(new InMemoryChatMemoryStore())//将聊天记忆以键值对存在内存中
+                .chatMemoryStore(mongoChatMemoryStore)
+                .build();
+    }
+}
